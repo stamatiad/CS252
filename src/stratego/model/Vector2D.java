@@ -8,7 +8,7 @@ package stratego.model;
  */
 public class Vector2D {
 	
-	int x , y;
+	public int x , y;
 
 	public Vector2D(int y, int x){
 		this.x = x;

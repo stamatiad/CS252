@@ -13,12 +13,8 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 	
 	private List<Vector2D> movePattern = new ArrayList<Vector2D>();
 			
-	public MovablePlayerToken(String name, String own){
+	public MovablePlayerToken(String name, Object own){
 		super(name,own);
-		/*this.row = -1;
-		this.col = -1;
-		this.own = "Game";
-		this.name = "";*/
 		
 		this.movePattern.add(new Vector2D(-1,0));
 		this.movePattern.add(new Vector2D(1,0));
@@ -32,15 +28,13 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 	 * @return Array of token class movement locations (Y,X)
 	 */
 	public List<Vector2D> getMovePattern(){
-		return this.movePattern;
+		List<Vector2D> loc = new ArrayList<Vector2D>();
+		//return absolute board position:
+		for(int i=0 ; i<this.movePattern.size(); i++){
+			loc.add(new Vector2D(this.getRow()+this.movePattern.get(i).y,this.getCol()+this.movePattern.get(i).x));
+		}
+		
+		return loc;
 	}
-	/*
-	public void setOwn(String own){
-		this.own = own;
-	}
-	
-	public void setName(String name){
-		this.name = name;
-	}
-	*/
+
 }

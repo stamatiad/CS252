@@ -12,13 +12,14 @@ public class Fire extends Player implements PlayerInterface{
 	 * @param name
 	 */
 	public Fire(String name){
-		super(name);
+		super("Fire", name);
+
 	}
 	
-	public void initializePlayerTokens(){
+	/*public void initializePlayerTokens(){
 		//Create tokens and put them on list:
-		tokens.add( new Dragon("Fire") );
-		tokens.add( new Slayer("Fire") );
+		tokens.add( new Dragon(this.pname) );
+		tokens.add( new Slayer(this.pname) );
 		
-	}
+	}*/
 }

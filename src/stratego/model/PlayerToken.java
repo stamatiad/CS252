@@ -11,7 +11,7 @@ public abstract class PlayerToken implements Token {
 	public int row;
 	public int col;
 	public int rank;
-	public String own;
+	public Object own;
 	public String name;
 	
 	/*public PlayerToken(){
@@ -21,7 +21,7 @@ public abstract class PlayerToken implements Token {
 		this.name = "Blank";
 	}*/
 	
-	public PlayerToken(String name, String own){
+	public PlayerToken(String name, Object own){
 		//this();
 		this.name = name;
 		this.own = own;
@@ -46,7 +46,7 @@ public abstract class PlayerToken implements Token {
 		return this.col;
 	}
 	
-	public String getOwn(){
+	public Object getOwn(){
 		return this.own;
 	}
 	/*

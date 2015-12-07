@@ -14,7 +14,7 @@ public interface Token {
 	
 	public int getCol();
 	*/
-	public String getOwn();
+	public Object getOwn();
 	
 	//public void setOwn(String own);
 

@@ -10,7 +10,7 @@ public abstract class BackgroundToken implements Token {
 
 	//public int row;
 	//public int col;
-	public String own;
+	public Object own;
 	public String name;
 	
 	/*public BackgroundToken(){
@@ -43,7 +43,7 @@ public abstract class BackgroundToken implements Token {
 		return this.col;
 	}
 	*/
-	public String getOwn(){
+	public Object getOwn(){
 		return this.own;
 	}
 	/*

@@ -12,13 +12,13 @@ public class Ice extends Player implements PlayerInterface {
 	 * @param name
 	 */
 	public Ice(String name){
-		super(name);
+		super("Ice", name);
 	}
 	
-	public void initializePlayerTokens(){
+	/*public void initializePlayerTokens(){
 		//Create tokens and put them on list:
-		tokens.add( new Dragon("Ice") );
-		tokens.add( new Slayer("Ice") );
+		tokens.add( new Dragon(this.pname) );
+		tokens.add( new Slayer(this.pname) );
 		
-	}
+	}*/
 }

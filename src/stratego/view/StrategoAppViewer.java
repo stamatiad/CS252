@@ -21,6 +21,8 @@ import stratego.model.*;
 
 public class StrategoAppViewer {
 	private JPanel panel;
+	//Is this the best way?
+	private StrategoAppController controller = new StrategoAppController();
 	private int M, N;
 	private Board StrategoBoard;
 	//private List<String> iconsList = new ArrayList<String>();
@@ -40,48 +42,37 @@ public class StrategoAppViewer {
 		this.selectedToken = -1;
 		
 		//Preload token Icons:
+		//Names sorted with ranking:
 		iconsBuffer.put("rDragon.png", getIconImage("rDragon.png"));
 		iconsBuffer.put("bDragon.png", getIconImage("bDragon.png"));
+		iconsBuffer.put("rMage.png", getIconImage("rMage.png"));
+		iconsBuffer.put("bMage.png", getIconImage("bMage.png"));
+		iconsBuffer.put("rKnight.png", getIconImage("rKnight.png"));
+		iconsBuffer.put("bKnight.png", getIconImage("bKnight.png"));
+		iconsBuffer.put("rBeastRider.png", getIconImage("rBeastRider.png"));
+		iconsBuffer.put("bBeastRider.png", getIconImage("bBeastRider.png"));
+		iconsBuffer.put("rSorceress.png", getIconImage("rSorceress.png"));
+		iconsBuffer.put("bSorceress.png", getIconImage("bSorceress.png"));
+		iconsBuffer.put("rBeast.png", getIconImage("rBeast.png"));
+		iconsBuffer.put("bBeast.png", getIconImage("bBeast.png"));
+		iconsBuffer.put("rElf.png", getIconImage("rElf.png"));
+		iconsBuffer.put("bElf.png", getIconImage("bElf.png"));
+		iconsBuffer.put("rDwarf.png", getIconImage("rDwarf.png"));
+		iconsBuffer.put("bDwarf.png", getIconImage("bDwarf.png"));
+		iconsBuffer.put("rScout.png", getIconImage("rScout.png"));
+		iconsBuffer.put("bScout.png", getIconImage("bScout.png"));
 		iconsBuffer.put("rSlayer.png", getIconImage("rSlayer.png"));
 		iconsBuffer.put("bSlayer.png", getIconImage("bSlayer.png"));
+		iconsBuffer.put("rTrap.png", getIconImage("rTrap.png"));
+		iconsBuffer.put("bTrap.png", getIconImage("bTrap.png"));
+		iconsBuffer.put("rFlag.png", getIconImage("rFlag.png"));
+		iconsBuffer.put("bFlag.png", getIconImage("bFlag.png"));
+		iconsBuffer.put("rHidden.png", getIconImage("rHidden.png"));
+		iconsBuffer.put("bHidden.png", getIconImage("bHidden.png"));
 		iconsBuffer.put("Grass.png", getIconImage("Grass.png"));
 		iconsBuffer.put("Rock.png", getIconImage("Rock.png"));
-		/*
-		iconsBuffer[0] = getIconImage("rDragon.png");
-		iconsBuffer[0] = getIconImage("bDragon.png");
-		iconsBuffer[0] = getIconImage("rMage.png");
-		iconsBuffer[0] = getIconImage("bMage.png");
-		iconsBuffer[0] = getIconImage("rKnight.png");
-		iconsBuffer[0] = getIconImage("bKnight.png");
-		iconsBuffer[0] = getIconImage("rBeastRider.png");
-		iconsBuffer[0] = getIconImage("bBeastRider.png");
-		iconsBuffer[0] = getIconImage("rSorceress.png");
-		iconsBuffer[0] = getIconImage("bSorceress.png");
-		iconsBuffer[0] = getIconImage("rBeast.png");
-		iconsBuffer[0] = getIconImage("bBeast.png");
-		iconsBuffer[0] = getIconImage("rElf.png");
-		iconsBuffer[0] = getIconImage("bElf.png");
-		iconsBuffer[0] = getIconImage("rDwarf.png");
-		iconsBuffer[0] = getIconImage("bDwarf.png");
-		iconsBuffer[0] = getIconImage("rScout.png");
-		iconsBuffer[0] = getIconImage("bScout.png");
-		*/
-		//Names sorted with ranking:
-		/*this.iconsList.add("Dragon.png"); //0
-		this.iconsList.add("Mage.png");
-		this.iconsList.add("Knight.png");
-		this.iconsList.add("BeastRider.png");
-		this.iconsList.add("Sorceress.png");
-		this.iconsList.add("Beast.png");
-		this.iconsList.add("Elf.png");
-		this.iconsList.add("Dwarf.png");
-		this.iconsList.add("Scout.png");
-		this.iconsList.add("Slayer.png");
-		this.iconsList.add("Trap.png");
-		this.iconsList.add("Flag.png");
-		this.iconsList.add("Hidden.png");//12
-		this.iconsList.add("Grass.png");//13
-		this.iconsList.add("Rock.png");*/
+
+
 	}
 
 	private JButton getGridButton(int r, int c) {
@@ -126,33 +117,6 @@ public class StrategoAppViewer {
         });
         return b;
 	}
-    
-        
-	/*private void updateGridListeners() {
-        for(int i=0 ; i<this.StrategoBoard.tokens.size() ; i++){
-        	Token tkn = this.StrategoBoard.tokens.get(i);
-        	final int row = tkn.getRow();
-        	final int col = tkn.getCol();
-        	tkn.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                	System.out.println("r"+row + " c"+col);
-                	//check if selected and toggle (Ctrl):
-                	//Check if other selected for action:(ctrl: src and trg)
-                	//Action -> move
-                	//Action -> Attack
-                	//highlight with green for movement and red for no movement(Ctrl+view):
-                	
-                	
-                	
-                }
-            });
-        }
-		
-		//Override method will still work?
-        //return b;
-    }*/
 	
 	private JPanel createGridPanel() {
         JPanel p = new JPanel(new GridLayout(this.M, this.N));
@@ -161,7 +125,7 @@ public class StrategoAppViewer {
             int row = i / this.N;
             int col = i % this.N;
             JButton gb = createGridButton(row, col);
-            Token tkn = this.StrategoBoard.getToken(row,col);
+            /*Token tkn = this.StrategoBoard.getToken(row,col);
             if(tkn instanceof BackgroundToken){
             	toggleButton(gb, false);
             } else {
@@ -169,11 +133,12 @@ public class StrategoAppViewer {
             }
             gb.setIcon(this.getTokenIcon(tkn));
             //this.buttons.add(gb);
+             */
             this.buttons[row][col] = gb;
             p.add(gb);
             //p.add(tkn);
+             
         }
-        
         return p;
     }
 	/**
@@ -210,39 +175,20 @@ public class StrategoAppViewer {
 	
 	private ImageIcon getTokenIcon(Token tkn){
 		String filename = new String();
-		if(tkn.getOwn().equals("Player1")){
+		if(tkn.getOwn() instanceof Fire){
 			filename = filename.concat("r");
 		}
-		if(tkn.getOwn().equals("Player2")){
+		if(tkn.getOwn() instanceof Ice){
 			filename = filename.concat("b");
 		}
 		filename = filename.concat(tkn.getName());
 		filename = filename.concat(".png");
-		return (ImageIcon)iconsBuffer.get(filename);
-		//return getIconImage(filename);
-		
-		/*if(tkn.getOwn().equals("Game")){
-			if(tkn.getClass().equals(Grass.class)){
-				return getIconImage(filename.concat(this.iconsList.get(13)));
-	        }
-			if(tkn.getClass().equals(Rock.class)){
-				return getIconImage(filename.concat(this.iconsList.get(14)));
-	        }
-        }
-		if(tkn.getOwn().equals("Fire")){
-			filename.concat("r");
-		}
-		if(tkn.getOwn().equals("Ice")){
-			filename.concat("b");
-		}*/
-		//Get proper icon for token class:
-		//return null;
-		
+		return (ImageIcon)iconsBuffer.get(filename);		
 	}
 	
 	private ImageIcon getIconImage(String filename) { //image from file
         try {
-        	//URL url = getClass().getResource("/resources/images/"+filename);
+        	URL url = getClass().getResource("/resources/images/"+filename);
             return new ImageIcon(ImageIO.read(getClass().getResource("/resources/images/"+filename)).
                     getScaledInstance(100, 80, Image.SCALE_SMOOTH)); //image
         } catch (IOException ex) {
@@ -258,11 +204,20 @@ public class StrategoAppViewer {
 	 * @param col THe clicked token column
 	 */
 	private void selectToken(int row, int col){
+		List<Vector2D> moveLocations = new ArrayList<Vector2D>();
 		//Check if clicked button is previously selected:
 		int i = row * this.N + col;
 		if(this.selectedToken == -1){
+			//highlight selected token:
 			this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
 			this.selectedToken = i;
+			Token tkn = this.StrategoBoard.getToken(row,col);
+			moveLocations = this.controller.tokenSelection(this.StrategoBoard, tkn);
+			//highlight selected token possible movement locations:
+			for(int ii=0;ii<moveLocations.size();ii++){
+				this.buttons[moveLocations.get(ii).y][moveLocations.get(ii).x].setBorder(BorderFactory.createLineBorder(Color.GREEN,3));				
+			}
+			
 		}
 		else if(this.selectedToken == i){
 			this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.black,0));
@@ -272,12 +227,12 @@ public class StrategoAppViewer {
             int c = this.selectedToken % this.N;
 			//Check if the target is a token to interact with:
             long startTime = System.currentTimeMillis();
-			//boolean rslt = StrategoAppController.tokenAction(this.StrategoBoard, this.StrategoBoard.getToken(r,c), this.StrategoBoard.getToken(row,col));
+			boolean rslt = this.controller.tokenAction(this.StrategoBoard, this.StrategoBoard.getToken(r,c), this.StrategoBoard.getToken(row,col),this);
 			long endTime = System.currentTimeMillis();
 			System.out.println("tokenAction() " + (endTime - startTime) + " milliseconds");
 			//Token tkn = this.StrategoBoard.getToken(row,col);
 			
-			if(true){
+			if(rslt){
 				this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
 				this.selectedToken = -1;
 			}else{

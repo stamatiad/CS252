@@ -26,6 +26,9 @@ public class StrategoAppController {
 	//public Token[] Player2Tokens = new Token[30];
 	//public List<Token> BoardTokens = new ArrayList<Token>;
 	
+	public StrategoAppController(){
+		
+	}
 	/**
 	 * start method initializes the StrategoAppController:
 	 * 1. Creates a Board
@@ -37,47 +40,36 @@ public class StrategoAppController {
 		StrategoBoard = new Board(M, N);
 		//Insert Board's background tokens:
 		//Easy peasy, lemon squeezy
-		
 		for(int i=0 ; i<this.M*this.N ; i++){
 			int row = i / this.N;
             int col = i % this.N;
-            this.insertToken2Board(StrategoBoard,StrategoBoard.grassToken,row,col);
+            if( (2 < row && row < 5) && ((1 < col & col < 4)|(5 < col & col < 8)) ){
+            	this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,row,col);
+            }else{
+            	this.insertToken2Board(StrategoBoard,StrategoBoard.grassToken,row,col);            	
+            }
 		}
-		
-		/*this.insertToken2Board(this.grassToken,3,0);
-		this.insertToken2Board(this.grassToken,3,1);
-		this.insertToken2Board(this.grassToken,4,0);
-		this.insertToken2Board(this.grassToken,4,1);
-		*/
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,3,2);
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,3,3);
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,4,2);
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,4,3);
-		/*
-		this.insertToken2Board(this.grassToken,3,4);
-		this.insertToken2Board(this.grassToken,3,5);
-		this.insertToken2Board(this.grassToken,4,4);
-		this.insertToken2Board(this.grassToken,4,5);
-		*/
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,3,6);
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,3,7);
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,4,6);
-		this.insertToken2Board(StrategoBoard,StrategoBoard.rockToken,4,7);
-		/*
-		this.insertToken2Board(this.grassToken,3,8);
-		this.insertToken2Board(this.grassToken,3,9);
-		this.insertToken2Board(this.grassToken,4,8);
-		this.insertToken2Board(this.grassToken,4,9);
-		*/
-		
+
 		//Initialize tokens and players:
 		Player Fire = new Fire("steve");
 		Player Ice = new Ice("john");
 		
 		//Shuffle and insert players' tokens on board:
 		Collections.shuffle(Fire.tokens, new Random(0));
-		Collections.shuffle(Ice.tokens, new Random(0));
+		Collections.shuffle(Ice.tokens, new Random(1));
 		
+		for (int i = 0 ; i < Fire.tokens.size(); i++){
+			int index = M * N - i - 1;
+			int row = index / N;
+            int col = index % N;
+			this.insertToken2Board(StrategoBoard,Fire.tokens.get(i),row,col);
+		}
+		for (int i = 0 ; i < Ice.tokens.size(); i++){
+			int index = i;
+			int row = index / N;
+            int col = index % N;
+			this.insertToken2Board(StrategoBoard,Ice.tokens.get(i),row,col);
+		}
 
 		//Create viewport:
 		final StrategoAppViewer viewport = new StrategoAppViewer(StrategoBoard);
@@ -105,7 +97,39 @@ public class StrategoAppController {
 		//return this.tokens.get(index);
 		return b.BoardTokens[index];
 	}
+	public List<Vector2D> tokenSelection(Board board, Token tkn){
+		List<Vector2D> moveLocations = new ArrayList<Vector2D>();
+		//Determine if action is valid (is permitted):
+		if(tkn instanceof MovablePlayerToken){
+			//Get available positions for movement/attack
+			//based on token class:
+			MovablePlayerToken mtkn = (MovablePlayerToken)tkn;
+			//Get ABSOLUTE board locations:
+			moveLocations = mtkn.getMovePattern();
+			
+			//Vector2D pos = new Vector2D(mtkn.getRow(),mtkn.getCol());
+			//Check what locations are valid on the board:
+			moveLocations = insideBoard(moveLocations);
+
+		}
+		//else return empty valid move locations:
+		return moveLocations;
+	}
 	
+	public List<Vector2D> insideBoard(List<Vector2D> loc){
+		//remove locations if they fall outside of the board bounds:
+		for (int i=loc.size()-1 ; i>=0 ; i--){
+			//int rsltx = pos.x + loc.get(i).x;
+			//int rslty = pos.y + loc.get(i).y;
+			if( loc.get(i).x<0 | loc.get(i).x>N ){
+				loc.remove(i);
+			}
+			if( loc.get(i).y<0 | loc.get(i).y>M ){
+				loc.remove(i);
+			}
+		}
+		return loc;
+	}
 	/**
 	 * Performs an action fron source token to the target token.
 	 * Actions can be:
@@ -116,36 +140,38 @@ public class StrategoAppController {
 	 * @param trg The target token
 	 * @return The outcome of the action was successful. False: no action whatsoever.
 	 */
-	/*public static boolean tokenAction(Board board, Token src, Token trg){
+	public  boolean tokenAction(Board board, Token src, Token trg, StrategoAppViewer viewer){
+		List<Vector2D> moveLocations = new ArrayList<Vector2D>();
 		//Determine if action is valid (is permitted):
-		if(src instanceof ImmovableToken){
-			return true;
-		}
-		if(src instanceof MovableToken){
+		moveLocations = tokenSelection(board, src);
+		
+		if(moveLocations.size()>0){
 			//Get available positions for movement/attack:
-			MovableToken mtkn = (MovableToken)src;
-			Vector2D[] movements = mtkn.getMovement();
+			MovablePlayerToken msrc = (MovablePlayerToken)src;
+			MovablePlayerToken mtrg = (MovablePlayerToken)trg;
 			
-			//Check if action is possible:
+			//Check what token action to perform:
+			//this.moveToken(board, msrc, mtrg);
 			
-			
-			StrategoAppController.moveToken(board, src, trg);
+			//Since movement can only be done on a movable token:
+			//We trust controller that is a movable token:
+
 			return true;
 		}
 		return false;
 	}
 	
-	public static void moveToken(Board board, Token src, Token trg){
-		//Since movement can only be done on a grass token:
+	public void moveToken(Board board, MovablePlayerToken src, MovablePlayerToken trg){
 		//Swap tokens:
 		int tmpc = trg.getCol();
 		int tmpr = trg.getRow();
 		//Update:
-		board.insertToken(trg, src.getRow(), src.getCol());
-		board.insertToken(src, tmpr, tmpc);
+		this.insertToken2Board(board, trg, src.getRow(), src.getCol());
+		this.insertToken2Board(board,src, tmpr, tmpc);
 	}
-	public static void attackToken(Board board, Token src, Token trg){
+	public void attackToken(Board board, MovablePlayerToken src, PlayerToken trg){
 		//
 		
-	}*/
+	}
 }
+
