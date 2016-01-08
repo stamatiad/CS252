@@ -547,6 +547,7 @@ public class StrategoAppViewer {
 			//Token tkn = this.board.getToken(row,col);
 			
 			if(rslt){
+				//If tokenAction was successful:
 				//this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
 				//toggleSelectButton(this.buttons[r][c], false);
 				this.selectedToken = -1;
@@ -557,11 +558,13 @@ public class StrategoAppViewer {
 					disableAllButtons();
 				}
 			}else{
+				//If tokenAction was unsuccessful(or user intended otherwise):
 				//this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
 				//toggleSelectButton(this.buttons[r][c], true);
 				//this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
-				//toggleHighlightButton(this.buttons[row][col], true);
+				toggleHighlightButton(this.buttons[row][col], true);
 				this.selectedToken = i;
+				this.highlighter = this.controller.tokenSelection(this.board, tkn);
 				System.out.println("FALSE tokenAction()");
 			}
 
