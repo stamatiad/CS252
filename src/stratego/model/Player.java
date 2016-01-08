@@ -1,21 +1,21 @@
 package stratego.model;
 
-/**
- * Defines abstract class for the Player model
- */
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Defines abstract class for the Player model
+ * @author stamatiad.st@gmail.com
+ *
+ */
 public abstract class Player {
 	public String name;
-	public String pname;
-	//public String clan; 
+	public String pname; 
 	public List<PlayerToken> tokens = new ArrayList<PlayerToken>(30);
 	
 	public Player(String pname, String name){
 		this.pname = pname;
 		this.name = name;
-		//this.clan = clan;
 		this.initializePlayerTokens();
 	}
 	
@@ -54,7 +54,7 @@ public abstract class Player {
 	
 	/**
 	 * Returns player's Flag Token.
-	 * @return
+	 * @return The Flag PlayerToken.
 	 */
 	public PlayerToken getFlag(){
 		PlayerToken theFlag = null;
@@ -67,6 +67,11 @@ public abstract class Player {
 		return theFlag;
 	}
 	
+	/**
+	 * Get the total number of token save actions, all of the
+	 * Player's Tokens performed.
+	 * @return The total number of save actions.
+	 */
 	public int getTotalSaves(){
 		int cumm = 0;
 		for(int i=0;i<this.tokens.size();i++){

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Defines the basic (common to all subclasses) functionality of movable
  * player's tokens.
- * @author steve
+ * @author stamatiad.st@gmail.com
  *
  */
 public abstract class MovablePlayerToken extends PlayerToken implements Token {
@@ -26,7 +26,7 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 	}
 	
 	/**
-	 * Returns the (relative) movement pattern of the token.
+	 * <b>post-condition</b>: Returns the (relative) movement pattern of the token.
 	 * @return Array of token class movement locations (Y,X)
 	 */
 	public List<Vector2D> getMovePattern(){
@@ -40,7 +40,7 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 	}
 
 	/**
-	 * Performs an attack to trg PlayerToken
+	 * <b>post-condition</b>: Performs an attack to trg PlayerToken
 	 * @param trg
 	 * @return
 	 */
@@ -60,10 +60,22 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 		return outcome;
 	}
 	
+	/**
+	 * <b>post-condition</b>: Get Token saves performed
+	 * by the Token.
+	 * @return Token saves performed by the Token.
+	 */
 	public int getSavesPerformed(){
 		return this.savesPerformed;
 	}
 	
+	/**
+	 * Increments Token's save counter. If maximum saves are exceeded,
+	 * no increment is taking place and returns false.
+	 * <b>pre-condition</b>: Token performed less than twice a save.
+	 * <b>post-condition</b>: Token's save counter increments.
+	 * @return boolean true if incremented, else false.
+	 */
 	public boolean savedToken(){
 		if(this.savesPerformed<=2){
 			this.savesPerformed++;

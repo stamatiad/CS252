@@ -1,13 +1,9 @@
 package stratego.controller;
 
-import java.awt.GridLayout;
-import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import javax.swing.*;
 
 import stratego.model.*;
 import stratego.view.*;
@@ -23,17 +19,17 @@ public class StrategoAppController {
 	public  Turn turn;
 	private static final int M = 8;
 	private static final int N = 10;
-	//public Token[] Player1Tokens = new Token[30];
-	//public Token[] Player2Tokens = new Token[30];
-	//public List<Token> BoardTokens = new ArrayList<Token>;
-	List<Vector2D> moveLocations;
+	public List<Vector2D> moveLocations;
 	private List<MovablePlayerToken> lostTokensFire = new ArrayList<MovablePlayerToken>();
 	
+	/**
+	 * <b>post-condition</b>: Creates tha main game controller.
+	 */
 	public StrategoAppController(){
 		moveLocations = new ArrayList<Vector2D>();
 	}
 	/**
-	 * start method initializes the StrategoAppController:
+	 * <b>post-condition</b>: Initializes the StrategoAppController:
 	 * 1. Creates a Board
 	 * 2. Creates two players
 	 * 3. Creates the Viewer for the game
@@ -41,7 +37,7 @@ public class StrategoAppController {
 	public void start(){
 		//Initialize board:
 		StrategoBoard = new Board(M, N);
-		//Insert Board's background tokens:
+		//Insert Board's background tokens (Grass, Rock):
 		//Easy peasy, lemon squeezy:
 		for(int i=0 ; i<this.M*this.N ; i++){
 			int row = i / this.N;
@@ -57,6 +53,7 @@ public class StrategoAppController {
 		Player Fire = new Fire("steve");
 		Player Ice = new Ice("john");
 		
+		//Initialize Turn based system between the players:
 		turn = new Turn(Fire, Ice);
 		
 		//Shuffle and insert players' tokens on board:
@@ -78,15 +75,18 @@ public class StrategoAppController {
 
 		//Create viewport:
 		final StrategoAppViewer viewport = new StrategoAppViewer(this, StrategoBoard, turn);
+		//Render viewport:
 		viewport.display();
-		/*Token t1 = StrategoBoard.getToken(0,0);
-		Token t2 = StrategoBoard.getToken(0,1);
-		StrategoBoard.insertToken(t2,0,0);
-		StrategoBoard.insertToken(t1,0,1);
-*/
 		
 	}
 	
+	/**
+	 * 
+	 * @param b
+	 * @param t
+	 * @param row
+	 * @param col
+	 */
 	public void insertToken2Board(Board b, Token t, int row, int col){
 		if(t instanceof PlayerToken){
 			PlayerToken ct = (PlayerToken)t;
@@ -97,9 +97,9 @@ public class StrategoAppController {
 		b.BoardTokens[index] = t;
 	}
 	
+	
 	public Token getReference2Token(Board b, int row, int col){
 		int index = row * this.N + col;
-		//return this.tokens.get(index);
 		return b.BoardTokens[index];
 	}
 	
@@ -133,19 +133,6 @@ public class StrategoAppController {
 			}else{
 				blocked = true;
 			}
-			/*Token bt = board.getToken(ny, x);
-			if(!isInsideBoard(new Vector2D(ny,x))){
-				blocked = true;
-			}else if(hitsRock(new Vector2D(ny,x))){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().side()){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().otherSide()){
-				sctMovements.add(new Vector2D(ny,x));
-				blocked = true;
-			}else{
-				sctMovements.add(new Vector2D(ny,x));
-			}*/
 		}
 		blocked = false;
 		//Positive Y:
@@ -167,19 +154,6 @@ public class StrategoAppController {
 			}else{
 				blocked = true;
 			}
-			/*Token bt = board.getToken(ny, x);
-			if(!isInsideBoard(new Vector2D(ny,x))){
-				blocked = true;
-			}else if(hitsRock(new Vector2D(ny,x))){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().side()){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().otherSide()){
-				sctMovements.add(new Vector2D(ny,x));
-				blocked = true;
-			}else{
-				sctMovements.add(new Vector2D(ny,x));
-			}*/
 		}
 		blocked = false;
 		//Negative X:
@@ -201,19 +175,6 @@ public class StrategoAppController {
 			}else{
 				blocked = true;
 			}
-			/*Token bt = board.getToken(y, nx);
-			if(!isInsideBoard(new Vector2D(y,nx))){
-				blocked = true;
-			}else if(hitsRock(new Vector2D(y,nx))){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().side()){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().otherSide()){
-				sctMovements.add(new Vector2D(y,nx));
-				blocked = true;
-			}else{
-				sctMovements.add(new Vector2D(y,nx));
-			}*/
 		}
 		blocked = false;
 		//Positive X:
@@ -235,19 +196,6 @@ public class StrategoAppController {
 			}else{
 				blocked = true;
 			}
-			/*Token bt = board.getToken(y, nx);
-			if(!isInsideBoard(new Vector2D(y,nx))){
-				blocked = true;
-			}else if(hitsRock(new Vector2D(y,nx))){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().side()){
-				blocked = true;
-			}else if(bt.getOwn() == this.getTurn().otherSide()){
-				sctMovements.add(new Vector2D(y,nx));
-				blocked = true;
-			}else{
-				sctMovements.add(new Vector2D(y,nx));
-			}*/
 		}
 		
 		return sctMovements;
@@ -417,20 +365,7 @@ public class StrategoAppController {
 		extraMovements = validInPlayer(board, extraMovements);
 		
 		movements.addAll(extraMovements);
-		/*
-		movements.add(new Vector2D(y-1,x-1));
-		movements.add(new Vector2D(y+1,x-1));
-		movements.add(new Vector2D(y-1,x+1));
-		movements.add(new Vector2D(y+1,x+1));
-		
-		movements.add(new Vector2D(y-2,x));
-		movements.add(new Vector2D(y+2,x));
-		movements.add(new Vector2D(y,x-2));
-		movements.add(new Vector2D(y,x+2));
-		
-		movements = validInBoard(movements);
-		movements = validInPlayer(movements);
-		*/
+
 		return movements;		
 	}
 	
@@ -550,26 +485,11 @@ public class StrategoAppController {
 	public List<Vector2D> validInBoard(List<Vector2D> loc){
 		//remove locations if they fall outside of the board bounds:
 		for (int i=loc.size()-1 ; i>=0 ; i--){
-			//int rsltx = pos.x + loc.get(i).x;
-			//int rslty = pos.y + loc.get(i).y;
-			//Use isInsideBoard():
 			if(!isInsideBoard(new Vector2D(loc.get(i).y, loc.get(i).x))){
 				loc.remove(i);
 			}else if(hitsRock(new Vector2D(loc.get(i).y, loc.get(i).x))){
 				loc.remove(i);
 			}
-			/*if( loc.get(i).x<0 | loc.get(i).x>N ){
-				loc.remove(i);
-			}
-			if( loc.get(i).y<0 | loc.get(i).y>M ){
-				loc.remove(i);
-			}*/
-
-			/*
-			//remove locations if they fall on rocks:
-			if( (2 < loc.get(i).y && loc.get(i).y < 5) && ((1 < loc.get(i).x & loc.get(i).x < 4)|(5 < loc.get(i).x & loc.get(i).x < 8)) ){
-				loc.remove(i);
-	        }*/
 		}
 		
 		return loc;
@@ -583,16 +503,6 @@ public class StrategoAppController {
 			if(board.getToken(loc.get(i).y,loc.get(i).x).getOwn() == this.getTurn().side()){
 				loc.remove(i);
 			}
-			/*for (int ii=0;ii<this.getTurn().side().tokens.size();ii++){
-				//Since belong tp the player, are PlayerToken???
-				PlayerToken t = (PlayerToken)this.getTurn().side().tokens.get(ii);
-				int x = t.getCol();
-				int y = t.getRow();
-				if( x == loc.get(i).x && y == loc.get(i).y ){
-					loc.remove(i);
-					break;
-				}
-			}*/
 		}
 		return loc;
 	}
@@ -633,19 +543,6 @@ public class StrategoAppController {
 				attackPositions.remove(k);
 			}			
 		}
-		
-		/*if(board.getToken(y-1, x).getOwn() == this.getTurn().otherSide()){
-			attackPositions.add(new Vector2D(y-1,x));			
-		}
-		if(board.getToken(y+1, x).getOwn() == this.getTurn().otherSide()){
-			attackPositions.add(new Vector2D(y+1,x));			
-		}
-		if(board.getToken(y, x-1).getOwn() == this.getTurn().otherSide()){
-			attackPositions.add(new Vector2D(y,x-1));			
-		}
-		if(board.getToken(y, x+1).getOwn() == this.getTurn().otherSide()){
-			attackPositions.add(new Vector2D(y,x+1));			
-		}*/
 		
 		return attackPositions;
 	}

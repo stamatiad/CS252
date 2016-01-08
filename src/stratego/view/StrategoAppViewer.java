@@ -24,19 +24,18 @@ import javax.swing.*;
 import stratego.controller.*;
 import stratego.model.*;
 
+/**
+ * StrategoAppViewer handles all the viewing aspects of the game.
+ * @author stamatiad.st@gmail.com
+ */
 public class StrategoAppViewer {
-	private JPanel panel;
-	//Is this the best way?
-	private StrategoAppController controller; //= new StrategoAppController();
+	//private JPanel panel;
+	private StrategoAppController controller;
 	public Turn turn;
 	private int M, N;
 	public Board board;
-	//private List<String> iconsList = new ArrayList<String>();
-	//private final List<JButton> buttons = new ArrayList<JButton>();
 	private final JButton[][] buttons = new JButton[8][10];
-	//private ImageIcon[] iconsBuffer = new ImageIcon[28];
 	private HashMap iconsBuffer = new HashMap(39);
-	//private final List<Token> list = new ArrayList<Token>();
 	private int selectedToken;
 	private boolean selectedSpecialPower;
 	public JFrame viewFrame;
@@ -46,6 +45,15 @@ public class StrategoAppViewer {
 	private final JButton[][] buttonsLostTokensFire = new JButton[8][3];
 	private final JButton[][] buttonsLostTokensIce = new JButton[8][3];
 	
+	/**
+	 * <b>pre-condition</b>: A valid game StrategoAppController and Board
+	 * must be provided.
+	 * <b>post-condition</b>: Creates and initializes the
+	 * Viewer for the game.
+	 * @param controller The Controller of the game.
+	 * @param board The Board of the game.
+	 * @param turn The Turn controlling module of the game.
+	 */
 	public StrategoAppViewer(StrategoAppController controller, Board board, Turn turn){
 		this.controller = controller;
 		this.board = board;
@@ -103,33 +111,23 @@ public class StrategoAppViewer {
 
 	}
 
+	/**
+	 * Fetch requested button reference from the playing board.
+	 * @param r Row of requested button in Board.
+	 * @param c Column of requested button in Board.
+	 * @return
+	 */
 	private JButton getGridButton(int r, int c) {
-        //int index = r * N + c;
         //return this.buttons.get(index);
 		return this.buttons[r][c];
     }
 	
-	/*private Token createGridButton(Token tkn, final int row, final int col) {
-        //final Token b = new Token("r" + row + ",c" + col);
-		//final Token b = new Dragon(row, col);
-		//int row = tkn.getRow();
-		//int col = tkn.getCol();
-		tkn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	//int row = tkn.getRow();
-        		//int col = tkn.getCol();
-            	Token gb = StrategoAppViewer.this.getGridButton(row, col);
-                System.out.println("r" + row + ",c" + col
-                    + " " + (tkn == gb)
-                    + " " + (tkn.equals(gb)));
-            }
-        });
-		//Override method will still work?
-        //return b;
-    }*/
-	
+	/**
+	 * Creates a Token button in the playing Board.
+	 * @param row Row of button in Board.
+	 * @param col Column of button in Board.
+	 * @return
+	 */
 	private JButton createGridButton(final int row, final int col) {
         final JButton b = new JButton();
         b.addActionListener(new ActionListener() {
@@ -146,6 +144,10 @@ public class StrategoAppViewer {
         return b;
 	}
 	
+	/**
+	 * Create the panel for the game Board.
+	 * @return the JPanel reflecting the Board.
+	 */
 	private JPanel createGridPanel() {
         JPanel p = new JPanel(new GridLayout(this.M, this.N));
         //Initialize icons in buttons:
@@ -154,23 +156,18 @@ public class StrategoAppViewer {
             int col = i % this.N;
             JButton gb = createGridButton(row, col);
             gb.setPreferredSize(new Dimension(92, 80));
-            /*Token tkn = this.board.getToken(row,col);
-            if(tkn instanceof BackgroundToken){
-            	toggleClickableButton(gb, false);
-            } else {
-            	toggleClickableButton(gb, true);
-            }
-            gb.setIcon(this.getTokenIcon(tkn));
-            //this.buttons.add(gb);
-             */
             this.buttons[row][col] = gb;
             p.add(gb);
-            //p.add(tkn);
-             
         }
         return p;
     }
 	
+	/**
+	 * Create button for the lost Tokens in the battlefield.
+	 * @param row Row of button in Board.
+	 * @param col Column of button in Board.
+	 * @return the JButton.
+	 */
 	private JButton createRestoreGridButton(final int row, final int col) {
         final JButton b = new JButton();
         b.addActionListener(new ActionListener() {
@@ -188,17 +185,15 @@ public class StrategoAppViewer {
         return b;
 	}
 	
+	/**
+	 * Creates the panel holding the lost Tokens of the game.
+	 * @param name
+	 * @return the JPanel.
+	 */
 	private JPanel createScoreGridPanel(String name) {
 		int M = 8;
 		int N = 3;
         JPanel p = new JPanel(new GridLayout(M,N));
-        /*JPanel lp = new JPanel(new GridLayout(1,1));
-        JLabel labelFire = new JLabel(name);
-        labelFire.setFont(new Font("Verdana",1,20));
-        labelFire.setPreferredSize(new Dimension(276, 80));
-        lp.add(labelFire);
-        p.add(lp);
-        */
         //Initialize icons in buttons:
         for (int i = 0; i < M * N; i++) {
             int row = i / N;
@@ -220,17 +215,21 @@ public class StrategoAppViewer {
     }
 	
 	/**
-	 * Toggle button for non-interaction with the player
-	 * @param b
-	 * @param toggle toggle value (enable, disable)
+	 * Toggle button for non-interaction with the player.
+	 * @param b The JButton to toggle on/off.
+	 * @param toggle toggle boolean value (enable, disable).
 	 */
 	private void toggleClickableButton(JButton b, boolean toggle){
 		b.setBorderPainted( toggle );
         b.setFocusPainted( toggle );
         b.setEnabled(toggle);
-        //viewFrame.repaint();
 	}
 	
+	/**
+	 * Toggles highlight of the currently selected Token on the Board.
+	 * @param b Selected button.
+	 * @param toggle Highlight toggle boolean value.
+	 */
 	private void toggleSelectButton(JButton b, boolean toggle){
 		if(toggle){
 			b.setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
@@ -239,6 +238,12 @@ public class StrategoAppViewer {
 		}
 	}
 	
+	/**
+	 * Toggles movement or special power highlight for the currently
+	 * selected Token on the Board.
+	 * @param b The JButton that the currently selected Token can act upon.
+	 * @param toggle The action toggle boolean value.
+	 */
 	private void toggleHighlightButton(JButton b, boolean toggle){
 		if(toggle){
 			if(this.selectedSpecialPower){
@@ -253,6 +258,7 @@ public class StrategoAppViewer {
 	
 	/**
 	 * Resets button state based on activePlayer etc.
+	 * @param pos The position on the Board that Token is to be reseted.
 	 */
 	private void resetButtonState(Vector2D pos){
 		int row = pos.y;
@@ -299,7 +305,6 @@ public class StrategoAppViewer {
 	
 	/**
 	 * Highlights and enables movement to valid buttons/locations.
-	 * @param toggle
 	 */
 	private void toggleApplyHighlighter(){
 		System.out.println("Highlighter contains:");
@@ -337,7 +342,6 @@ public class StrategoAppViewer {
 		for (int i = 0; i < this.M * this.N; i++) {
             int row = i / this.N;
             int col = i % this.N;
-            //JButton gb = this.buttons.get(i);
             JButton gb = this.buttons[row][col];
             Token tkn = this.board.getToken(row,col);
             gb.setIcon(this.getTokenIcon(tkn));
@@ -354,41 +358,6 @@ public class StrategoAppViewer {
             int row = i / this.N;
             int col = i % this.N;
             resetButtonState(new Vector2D(row,col));
-            
-            
-            /*
-            //JButton gb = this.buttons.get(i);
-            JButton gb = this.buttons[row][col];
-            Token tkn = this.board.getToken(row,col);
-            //If on a selected token state enable everything:
-            if(this.selectedToken>=0){
-            	if (tkn instanceof Rock){
-            		toggleClickableButton(gb, false);
-            	}else{
-            		toggleClickableButton(gb, true);
-            	}
-            }else{
-            	//Based on turn, conceal other player's tokens:
-                if (tkn instanceof BackgroundToken){
-                	gb.setIcon(this.getTokenIcon(tkn));
-                	gb.setDisabledIcon(this.getTokenIcon(tkn));
-                	toggleClickableButton(gb, false);
-                }else if(tkn.getOwn().getClass().equals(this.controller.getTurn().side().getClass())){
-                	gb.setIcon(this.getTokenIcon(tkn));
-                	gb.setDisabledIcon(this.getTokenIcon(tkn));
-                	toggleClickableButton(gb, true);
-                }else{
-                	gb.setIcon(this.getPlayerTokenHiddenIcon((PlayerToken)tkn));
-                	gb.setDisabledIcon(this.getPlayerTokenHiddenIcon((PlayerToken)tkn));
-                	toggleClickableButton(gb, false);
-                }
-            }
-             */
-            
-            
-            //this.buttons.add(gb,i);
-            //p.add(gb);
-            //p.add(tkn);
         }
 		
 		//If in selected state, change accordingly:
@@ -396,7 +365,8 @@ public class StrategoAppViewer {
 			toggleApplyHighlighter();
 		}		
 		
-		//Update Lost Tokens in both sides:
+		//Update Lost Tokens in both side panels:
+		//For Player1:
 		int ctr = 0;
 		ctr = 0;
 		lostTokensFire.clear();
@@ -416,7 +386,7 @@ public class StrategoAppViewer {
 				buttonsLostTokensFire[r][c].setDisabledIcon((ImageIcon)iconsBuffer.get("Token.png"));
 			}		
 		}
-
+		//For Player2:
 		ctr = 0;
 		lostTokensIce.clear();
 		for(int k=0;k<this.controller.getTurn().p2.tokens.size();k++){
@@ -437,6 +407,11 @@ public class StrategoAppViewer {
 		System.out.println("updateGrid() " + (endTime - startTime) + " milliseconds");
     }
 	
+	/**
+	 * Fetch from cache and apply the appropriate JButton ImageIcon for the input Token.
+	 * @param tkn The input Token to get a new ImageIcon.
+	 * @return The new ImageIcon.
+	 */
 	private ImageIcon getTokenIcon(Token tkn){
 		String filename = new String();
 		if(tkn.getOwn() instanceof Fire){
@@ -450,6 +425,11 @@ public class StrategoAppViewer {
 		return (ImageIcon)iconsBuffer.get(filename);		
 	}
 	
+	/**
+	 * Fetch from cache and apply the hidden token icon for the input Token.
+	 * @param tkn The input Token to get a new ImageIcon.
+	 * @return The new ImageIcon.
+	 */
 	private ImageIcon getPlayerTokenHiddenIcon(PlayerToken tkn){
 		String filename = new String();
 		if(tkn.getOwn() instanceof Fire){
@@ -463,6 +443,11 @@ public class StrategoAppViewer {
 		return (ImageIcon)iconsBuffer.get(filename);		
 	}
 	
+	/**
+	 * Fetch from cache and apply the special power token icon for the input Token.
+	 * @param tkn The input Token to get a new ImageIcon.
+	 * @return The new ImageIcon.
+	 */
 	private ImageIcon getPlayerTokenSpecialIcon(PlayerToken tkn){
 		String filename = new String();
 		if(tkn.getOwn() instanceof Fire){
@@ -476,6 +461,13 @@ public class StrategoAppViewer {
 		return (ImageIcon)iconsBuffer.get(filename);		
 	}
 	
+	
+	/**
+	 * Fetch from disk the input image. To be used as ImageIcon
+	 * in Tokens later on.
+	 * @param filename The filename of the queried image.
+	 * @return  The input image as a ImageIcon.
+	 */
 	private ImageIcon getIconImage(String filename) { //image from file
         try {
         	URL url = getClass().getResource("/resources/images/"+filename);
@@ -578,6 +570,13 @@ public class StrategoAppViewer {
 		this.updateGrid();
 	}
 	
+	/**
+	 * Experimental feature: handle properly the resizing of the game window, so as the
+	 * Board and Tokens to maintain their aspect ratio.
+	 * @param innerPanel JPanel containing the JButtons for each game Token, needed to
+	 *  maintain constant aspect ratio.
+	 * @param container The containing JPanel that can be resized freely. 
+	 */
 	private static void resizePreview(JPanel innerPanel, JPanel container) {
         int w = container.getWidth();
         int h = container.getHeight();
@@ -586,6 +585,10 @@ public class StrategoAppViewer {
         container.revalidate();
     }
 	
+/**
+ * The main StrategoAppViewer function that draws and refreshes the gaming
+ *  board and side panels.
+ */
 	public void display() {
         viewFrame = new JFrame("GridButton");
         
@@ -602,12 +605,6 @@ public class StrategoAppViewer {
         containerPanel.add(boardPanel);
         containerPanel.add(IcePanel.add(createScoreGridPanel("Ice")));
         
-        /*containerPanel.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                resizePreview(boardPanel, containerPanel);
-            }
-        });*/
         viewFrame.getContentPane().add(containerPanel);
         viewFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //viewFrame.setSize(920, 656);
@@ -616,7 +613,5 @@ public class StrategoAppViewer {
         viewFrame.setLocationRelativeTo(null);
         viewFrame.setVisible(true);
         
-        //StrategoAppController.tokenAction(this.board, this.board.getToken(0,0), this.board.getToken(0,1));
-        //this.updateGrid();
     }
 }

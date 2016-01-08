@@ -4,24 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements the Board Model, responsible to hold token locations
+ * Implements the Board model, responsible to hold token locations
  * during gameplay (for close interaction with game Viewer).
- * @author steve
+ * @author stamatiad.st@gmail.com
  *
  */
 public class Board {
 	private int M, N;
-	//public final List<Token> tokens = new ArrayList<Token>(80);
 	public final Token[] BoardTokens = new Token[80];
 	public Token grassToken;
 	public Token rockToken;
 	public List<PlayerToken> convertedTokens = new ArrayList<PlayerToken>();
 	
 	/**
-	 * Constracts and initializes an empty game Board.
-	 * <b>postcondition</b>: Constracts and initializes an empty game Board.
-	 * @param M
-	 * @param N
+	 * Constructs and initializes an empty game Board.
+	 * <b>post-condition</b>: Constructs and initializes an empty game Board.
+	 * @param M Board rows (vertical dimension).
+	 * @param N Board columns (Horizontal dimension).
 	 */
 	public Board(int M, int N){
 		this.M = M;
@@ -29,44 +28,45 @@ public class Board {
 		
 		this.grassToken = new Grass();
 		this.rockToken = new Rock();
-		
-		
 	}
 	
-	
-	
-	/*public void insertBoardToken(Token t, int row, int col){
-		if(t instanceof BackgroundToken){
-			int index = row * this.N + col;
-			this.BoardTokens[index] = t;
-		}else{
-			//Throw exception:
-		}
-	}*/
 	/**
-	 * Return the reference to the token in Board position
-	 * (r,c).
-	 * @param row
-	 * @param col
-	 * @return reference to token in that Board location.
+	 * Return the reference to the token in Board position(r,c).
+	 * <b>pre-condition</b>: The position must be inside game Board limits.
+	 * <b>post-condition</b>: Return the reference to the token in Board position(r,c).
+	 * @param row Row in the Board.
+	 * @param col Column in the Board.
+	 * @return Reference to token in that Board location.
 	 */
 	public Token getToken(int row, int col){
 		int index = row * this.N + col;
-		//return this.tokens.get(index);
 		return this.BoardTokens[index];
 	}
 	
+	/**
+	 * <b>post-condition</b>: Get Board number of rows.
+	 * @return Board number of rows.
+	 */
 	public int getM(){
 		return this.M;
 	}
 	
+	/**
+	 * <b>post-condition</b>: Get Board number of columns.
+	 * @return Board number of columns.
+	 */
 	public int getN(){
 		return this.N;
 	}
 	
 	/**
-	 * Check if PlayerToken is converted once during the game.
-	 * @param tkn
+	 * Check if PlayerToken is converted once during the game 
+	 * (Sorceress special power).
+	 * <b>post-condition</b>: boolean true if input Token is
+	 * converted once.
+	 * @param tkn The Token to check for conversion.
+	 * @return boolean true if input Token is
+	 * converted once.
 	 */
 	public boolean isConverted(PlayerToken tkn){
 		boolean output = false;

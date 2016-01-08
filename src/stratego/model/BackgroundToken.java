@@ -3,60 +3,41 @@ package stratego.model;
 /**
  * Defines the abstract class of Tokens owned by the Board
  * (and not the Players).
- * @author steve
+ * @author stamatiad.st@gmail.com
  *
  */
 public abstract class BackgroundToken implements Token {
 
-	//public int row;
-	//public int col;
 	public Object own;
 	public String name;
 	
-	/*public BackgroundToken(){
-		//this.row = -1;
-		//this.col = -1;
-		this.own = "Board";
-		this.name = "Blank";
-	}*/
-	
+	/**
+	 * Constructor of the Tokens that are handled by the
+	 * game controller and belong to the board. PlayerTokens 
+	 * can interact, but Players have no control over them.
+	 * <b>post-condition</b>: Creates a Token owned by the 
+	 * game Board.
+	 * @param name The name of the Token.
+	 */
 	public BackgroundToken(String name){
 		this.own = "Board";
 		this.name = name;
-		//this.row = r;
-		//this.col = c;
-	}
-	/*
-	public void setRow(int row){
-		this.row = row;
 	}
 	
-	public void setCol(int col){
-		this.col = col;
-	}
-	
-	public int getRow(){
-		return this.row;
-	}
-	
-	public int getCol(){
-		return this.col;
-	}
-	*/
+	/**
+	 * <b>post-condition</b>: Get the owner of the Token.
+	 * @return The owner of the Token (Must be Board).
+	 */
 	public Object getOwn(){
 		return this.own;
 	}
-	/*
-	public void setOwn(String own){
-		this.own = own;
-	}
-	*/
+
+	/**
+	 * <b>post-condition</b>: Get the name of the Token.
+	 * @return The name of the Token.
+	 */
 	public String getName(){
 		return this.name;
 	}
-	/*
-	public void setName(String name){
-		this.name = name;
-	}
-	 */
+
 }

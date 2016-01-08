@@ -1,25 +1,15 @@
 package stratego.model;
 
 /**
- * The main interface for game tokens;
- *
+ * The main interface for game tokens; implements only the basics
+ * of the basics.
+ * @version 1.0
+ * @author stamatiad.st@gmail.com
  */
 public interface Token {
 	
-	/*public void setRow(int row);
-	
-	public void setCol(int col);
-	
-	public int getRow();
-	
-	public int getCol();
-	*/
 	public Object getOwn();
 	
-	//public void setOwn(String own);
-
 	public String getName();
-	
-	//public void setName(String own);
-	
+
 }

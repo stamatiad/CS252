@@ -8,18 +8,12 @@ package stratego.model;
 public class Fire extends Player implements PlayerInterface{
 	
 	/**
-	 * <b>postcondition</b>: Constructs the Player Fire in the game
-	 * @param name
+	 * <b>post-condition</b>: Constructs the Player Fire in the game.
+	 * @param name The name of the Player that plays as Fire.
 	 */
 	public Fire(String name){
 		super("Fire", name);
 
 	}
 	
-	/*public void initializePlayerTokens(){
-		//Create tokens and put them on list:
-		tokens.add( new Dragon(this.pname) );
-		tokens.add( new Slayer(this.pname) );
-		
-	}*/
 }
