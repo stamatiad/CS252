@@ -1,6 +1,6 @@
 package stratego.model;
 
-public class Knight extends MovablePlayerToken implements Token{
+public class Knight extends SpecialMovablePlayerToken implements Token{
 
 	/**
 	 * <b>postcondition</b>: Constructs Dragon Player Token

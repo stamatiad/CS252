@@ -11,8 +11,9 @@ import java.util.List;
  */
 public abstract class MovablePlayerToken extends PlayerToken implements Token {
 	
-	private List<Vector2D> movePattern = new ArrayList<Vector2D>();
-			
+	public List<Vector2D> movePattern = new ArrayList<Vector2D>();
+	public int savesPerformed;
+	
 	public MovablePlayerToken(String name, Object own){
 		super(name,own);
 		
@@ -21,6 +22,7 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 		this.movePattern.add(new Vector2D(0,-1));
 		this.movePattern.add(new Vector2D(0,1));
 		
+		this.savesPerformed = 0;
 	}
 	
 	/**
@@ -37,4 +39,36 @@ public abstract class MovablePlayerToken extends PlayerToken implements Token {
 		return loc;
 	}
 
+	/**
+	 * Performs an attack to trg PlayerToken
+	 * @param trg
+	 * @return
+	 */
+	public String attackTo(PlayerToken trg){
+		String outcome = null;
+		if(trg.rank < this.rank){
+			outcome = new String("won");
+		}else if(trg.rank > this.rank){
+			outcome = new String("lost");
+		}else if(trg.rank == this.rank){
+			outcome = new String("tie");
+		}
+		//if attack on Trap, lose:
+		if(trg instanceof Trap){
+			outcome = new String("lost");
+		}
+		return outcome;
+	}
+	
+	public int getSavesPerformed(){
+		return this.savesPerformed;
+	}
+	
+	public boolean savedToken(){
+		if(this.savesPerformed<=2){
+			this.savesPerformed++;
+			return true;
+		}
+		return false;
+	}
 }

@@ -1,6 +1,6 @@
 package stratego.model;
 
-public class BeastRider extends MovablePlayerToken implements Token {
+public class BeastRider extends SpecialMovablePlayerToken implements Token {
 
 	/**
 	 * <b>postcondition</b>: Constructs Dragon Player Token

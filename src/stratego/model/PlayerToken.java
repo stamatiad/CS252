@@ -49,11 +49,16 @@ public abstract class PlayerToken implements Token {
 	public Object getOwn(){
 		return this.own;
 	}
-	/*
-	public void setOwn(String own){
+	
+	/**
+	 * Setting the owner of the Token. Usefull for converting Tokens
+	 * between sides.
+	 * @param own the new Player that owns the token.
+	 */
+	public void setOwn(Player own){
 		this.own = own;
 	}
-	*/
+	
 	public String getName(){
 		return this.name;
 	}

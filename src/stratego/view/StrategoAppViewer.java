@@ -1,10 +1,15 @@
 package stratego.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,23 +27,31 @@ import stratego.model.*;
 public class StrategoAppViewer {
 	private JPanel panel;
 	//Is this the best way?
-	private StrategoAppController controller = new StrategoAppController();
+	private StrategoAppController controller; //= new StrategoAppController();
+	public Turn turn;
 	private int M, N;
-	private Board StrategoBoard;
+	public Board board;
 	//private List<String> iconsList = new ArrayList<String>();
 	//private final List<JButton> buttons = new ArrayList<JButton>();
 	private final JButton[][] buttons = new JButton[8][10];
 	//private ImageIcon[] iconsBuffer = new ImageIcon[28];
-	private HashMap iconsBuffer = new HashMap(28);
+	private HashMap iconsBuffer = new HashMap(39);
 	//private final List<Token> list = new ArrayList<Token>();
 	private int selectedToken;
+	private boolean selectedSpecialPower;
+	public JFrame viewFrame;
+	private List<Vector2D> highlighter = new ArrayList<Vector2D>();
+	private List<MovablePlayerToken> lostTokensFire = new ArrayList<MovablePlayerToken>();
+	private List<MovablePlayerToken> lostTokensIce = new ArrayList<MovablePlayerToken>();
+	private final JButton[][] buttonsLostTokensFire = new JButton[8][3];
+	private final JButton[][] buttonsLostTokensIce = new JButton[8][3];
 	
-	
-	
-	public StrategoAppViewer(Board StrategoBoard){
-		this.StrategoBoard = StrategoBoard;
-		this.M = StrategoBoard.getM();
-		this.N = StrategoBoard.getN();
+	public StrategoAppViewer(StrategoAppController controller, Board board, Turn turn){
+		this.controller = controller;
+		this.board = board;
+		this.turn = turn;
+		this.M = board.getM();
+		this.N = board.getN();
 		this.selectedToken = -1;
 		
 		//Preload token Icons:
@@ -71,6 +84,21 @@ public class StrategoAppViewer {
 		iconsBuffer.put("bHidden.png", getIconImage("bHidden.png"));
 		iconsBuffer.put("Grass.png", getIconImage("Grass.png"));
 		iconsBuffer.put("Rock.png", getIconImage("Rock.png"));
+		
+		//Special Icons
+		iconsBuffer.put("srDragon.png", getIconImage("srDragon.png"));
+		iconsBuffer.put("sbDragon.png", getIconImage("sbDragon.png"));
+		iconsBuffer.put("srKnight.png", getIconImage("srKnight.png"));
+		iconsBuffer.put("sbKnight.png", getIconImage("sbKnight.png"));
+		iconsBuffer.put("srBeastRider.png", getIconImage("srBeastRider.png"));
+		iconsBuffer.put("sbBeastRider.png", getIconImage("sbBeastRider.png"));
+		iconsBuffer.put("srSorceress.png", getIconImage("srSorceress.png"));
+		iconsBuffer.put("sbSorceress.png", getIconImage("sbSorceress.png"));
+		iconsBuffer.put("srElf.png", getIconImage("srElf.png"));
+		iconsBuffer.put("sbElf.png", getIconImage("sbElf.png"));
+		
+		//Empty background Token:
+		iconsBuffer.put("Token.png", getIconImage("Token.png"));
 
 
 	}
@@ -125,11 +153,12 @@ public class StrategoAppViewer {
             int row = i / this.N;
             int col = i % this.N;
             JButton gb = createGridButton(row, col);
-            /*Token tkn = this.StrategoBoard.getToken(row,col);
+            gb.setPreferredSize(new Dimension(92, 80));
+            /*Token tkn = this.board.getToken(row,col);
             if(tkn instanceof BackgroundToken){
-            	toggleButton(gb, false);
+            	toggleClickableButton(gb, false);
             } else {
-            	toggleButton(gb, true);
+            	toggleClickableButton(gb, true);
             }
             gb.setIcon(this.getTokenIcon(tkn));
             //this.buttons.add(gb);
@@ -141,14 +170,182 @@ public class StrategoAppViewer {
         }
         return p;
     }
+	
+	private JButton createRestoreGridButton(final int row, final int col) {
+        final JButton b = new JButton();
+        b.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JButton gb = StrategoAppViewer.this.getGridButton(row, col);
+                //Select Lost Token:
+                //StrategoAppViewer.this.selectLostToken(row, col);
+                System.out.println("r" + row + ",c" + col
+                    + " " + (b == gb)
+                    + " " + (b.equals(gb)));
+            }
+        });
+        return b;
+	}
+	
+	private JPanel createScoreGridPanel(String name) {
+		int M = 8;
+		int N = 3;
+        JPanel p = new JPanel(new GridLayout(M,N));
+        /*JPanel lp = new JPanel(new GridLayout(1,1));
+        JLabel labelFire = new JLabel(name);
+        labelFire.setFont(new Font("Verdana",1,20));
+        labelFire.setPreferredSize(new Dimension(276, 80));
+        lp.add(labelFire);
+        p.add(lp);
+        */
+        //Initialize icons in buttons:
+        for (int i = 0; i < M * N; i++) {
+            int row = i / N;
+            int col = i % N;
+            JButton gb = createRestoreGridButton(row, col);
+            gb.setPreferredSize(new Dimension(92, 80));
+            gb.setIcon((ImageIcon)iconsBuffer.get("Token.png"));
+            gb.setDisabledIcon((ImageIcon)iconsBuffer.get("Token.png"));
+            toggleClickableButton(gb, false);
+            p.add(gb);
+            if(name.equals("Fire")){
+            	buttonsLostTokensFire[row][col] = gb;            	
+            }else{
+            	buttonsLostTokensIce[row][col] = gb;
+            }
+            
+        }
+        return p;
+    }
+	
 	/**
 	 * Toggle button for non-interaction with the player
 	 * @param b
 	 * @param toggle toggle value (enable, disable)
 	 */
-	private void toggleButton(JButton b, boolean toggle){
+	private void toggleClickableButton(JButton b, boolean toggle){
 		b.setBorderPainted( toggle );
         b.setFocusPainted( toggle );
+        b.setEnabled(toggle);
+        //viewFrame.repaint();
+	}
+	
+	private void toggleSelectButton(JButton b, boolean toggle){
+		if(toggle){
+			b.setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
+		}else{
+			b.setBorder(BorderFactory.createLineBorder(Color.BLACK,0));
+		}
+	}
+	
+	private void toggleHighlightButton(JButton b, boolean toggle){
+		if(toggle){
+			if(this.selectedSpecialPower){
+				b.setBorder(BorderFactory.createLineBorder(Color.CYAN,3));
+			}else{
+				b.setBorder(BorderFactory.createLineBorder(Color.GREEN,3));
+			}
+		}else{
+			b.setBorder(BorderFactory.createLineBorder(Color.BLACK,0));
+		}
+	}
+	
+	/**
+	 * Resets button state based on activePlayer etc.
+	 */
+	private void resetButtonState(Vector2D pos){
+		int row = pos.y;
+		int col = pos.x;
+		//JButton gb = this.buttons.get(i);
+		int r = this.selectedToken / this.N;
+        int c = this.selectedToken % this.N;
+        JButton gb = this.buttons[row][col];
+        Token tkn = this.board.getToken(row,col);
+        //If on a selected token state enable everything:
+    	//Based on turn, conceal other player's tokens:
+        if (tkn instanceof BackgroundToken){
+        	gb.setIcon(this.getTokenIcon(tkn));
+        	gb.setDisabledIcon(this.getTokenIcon(tkn));
+        	toggleClickableButton(gb, false);
+        }else if(tkn.getOwn().getClass().equals(this.controller.getTurn().side().getClass())){
+        	if(this.selectedSpecialPower && tkn instanceof SpecialMovablePlayerToken){
+        		PlayerToken stkn = (SpecialMovablePlayerToken)tkn;
+        		if(stkn.getRow()==r && stkn.getCol()==c){
+                	gb.setIcon(this.getPlayerTokenSpecialIcon(stkn));
+                	gb.setDisabledIcon(this.getPlayerTokenSpecialIcon(stkn));
+                	toggleClickableButton(gb, true);        		
+            	}
+        	}else{
+	        	gb.setIcon(this.getTokenIcon(tkn));
+	        	gb.setDisabledIcon(this.getTokenIcon(tkn));
+	        	toggleClickableButton(gb, true);
+	        	if( r==row && c==col){
+	        		toggleSelectButton(this.buttons[row][col], true);
+	        	}else{
+	        		toggleHighlightButton(this.buttons[row][col], false);	        		
+	        	}
+	        	
+        	}
+        }else{
+        	gb.setIcon(this.getPlayerTokenHiddenIcon((PlayerToken)tkn));
+        	gb.setDisabledIcon(this.getPlayerTokenHiddenIcon((PlayerToken)tkn));
+        	toggleClickableButton(gb, false);
+        	//einai aparethth h parakatw grammh?
+        	//toggleHighlightButton(this.buttons[row][col], false);
+        }     
+        
+	}
+	
+	/**
+	 * Highlights and enables movement to valid buttons/locations.
+	 * @param toggle
+	 */
+	private void toggleApplyHighlighter(){
+		System.out.println("Highlighter contains:");
+		for(int i=0;i<this.highlighter.size();i++){
+			System.out.println("R "+ (this.highlighter.get(i).y+1) +" C "+ (this.highlighter.get(i).x+1) );
+		}
+		if(this.highlighter.size()>0){
+			//highlight any previous movements:
+			for(int i=0;i<this.highlighter.size();i++){
+				//this.buttons[highlighter.get(ii).y][highlighter.get(ii).x].setBorder(BorderFactory.createLineBorder(Color.GREEN,3));
+				toggleHighlightButton(this.buttons[this.highlighter.get(i).y][this.highlighter.get(i).x], true);
+				toggleClickableButton(this.buttons[this.highlighter.get(i).y][this.highlighter.get(i).x], true);
+				//edw 8elw ena function gia to default state anti gia toggle:
+			}
+		}else{
+			//de-highlight any previous movements (reset player tokens to they default state):
+			for(int i=0;i<this.highlighter.size();i++){
+				//this.buttons[highlighter.get(ii).y][highlighter.get(ii).x].setBorder(BorderFactory.createLineBorder(Color.GREEN,3));
+				resetButtonState(new Vector2D(this.highlighter.get(i).y, this.highlighter.get(i).x));
+				//toggleHighlightButton(this.buttons[highlighter.get(i).y][highlighter.get(i).x], false);
+				//toggleClickableButton(this.buttons[highlighter.get(i).y][highlighter.get(i).x], false);
+				//edw 8elw ena function gia to default state anti gia toggle:
+			}
+			//Reset highlighter array:
+			//this.highlighter = new ArrayList<Vector2D>();
+		}
+		
+		
+	}
+	
+	/**
+	 * Reveal and disable all board Tokens (At game end).
+	 */
+	private void disableAllButtons(){
+		for (int i = 0; i < this.M * this.N; i++) {
+            int row = i / this.N;
+            int col = i % this.N;
+            //JButton gb = this.buttons.get(i);
+            JButton gb = this.buttons[row][col];
+            Token tkn = this.board.getToken(row,col);
+            gb.setIcon(this.getTokenIcon(tkn));
+        	gb.setDisabledIcon(this.getTokenIcon(tkn));
+        	toggleClickableButton(gb, false);
+        	toggleSelectButton(gb, false);
+        	toggleHighlightButton(gb, false);
+        }
 	}
 	
 	private void updateGrid() {
@@ -156,19 +353,86 @@ public class StrategoAppViewer {
 		for (int i = 0; i < this.M * this.N; i++) {
             int row = i / this.N;
             int col = i % this.N;
+            resetButtonState(new Vector2D(row,col));
+            
+            
+            /*
             //JButton gb = this.buttons.get(i);
             JButton gb = this.buttons[row][col];
-            Token tkn = this.StrategoBoard.getToken(row,col);
-            if(tkn instanceof BackgroundToken){
-            	toggleButton(gb, false);
-            } else {
-            	toggleButton(gb, true);
+            Token tkn = this.board.getToken(row,col);
+            //If on a selected token state enable everything:
+            if(this.selectedToken>=0){
+            	if (tkn instanceof Rock){
+            		toggleClickableButton(gb, false);
+            	}else{
+            		toggleClickableButton(gb, true);
+            	}
+            }else{
+            	//Based on turn, conceal other player's tokens:
+                if (tkn instanceof BackgroundToken){
+                	gb.setIcon(this.getTokenIcon(tkn));
+                	gb.setDisabledIcon(this.getTokenIcon(tkn));
+                	toggleClickableButton(gb, false);
+                }else if(tkn.getOwn().getClass().equals(this.controller.getTurn().side().getClass())){
+                	gb.setIcon(this.getTokenIcon(tkn));
+                	gb.setDisabledIcon(this.getTokenIcon(tkn));
+                	toggleClickableButton(gb, true);
+                }else{
+                	gb.setIcon(this.getPlayerTokenHiddenIcon((PlayerToken)tkn));
+                	gb.setDisabledIcon(this.getPlayerTokenHiddenIcon((PlayerToken)tkn));
+                	toggleClickableButton(gb, false);
+                }
             }
-            gb.setIcon(this.getTokenIcon(tkn));
+             */
+            
+            
             //this.buttons.add(gb,i);
             //p.add(gb);
             //p.add(tkn);
         }
+		
+		//If in selected state, change accordingly:
+		if(this.selectedToken>=0){
+			toggleApplyHighlighter();
+		}		
+		
+		//Update Lost Tokens in both sides:
+		int ctr = 0;
+		ctr = 0;
+		lostTokensFire.clear();
+		for(int k=0;k<this.controller.getTurn().p1.tokens.size();k++){
+			int r = ctr / 3;
+	        int c = ctr % 3;
+			if( (this.controller.getTurn().p1.tokens.get(k).getRow() < 0) ){
+				if(this.controller.getTurn().p1.tokens.get(k) instanceof MovablePlayerToken){
+			      //Distribute the Lost Tokens in each jPanel:
+					lostTokensFire.add((MovablePlayerToken)this.controller.getTurn().p1.tokens.get(k));
+					buttonsLostTokensFire[r][c].setIcon(this.getTokenIcon(this.controller.getTurn().p1.tokens.get(k)));
+					buttonsLostTokensFire[r][c].setDisabledIcon(this.getTokenIcon(this.controller.getTurn().p1.tokens.get(k)));
+					ctr++;
+				}
+			}else{
+				buttonsLostTokensFire[r][c].setIcon((ImageIcon)iconsBuffer.get("Token.png"));
+				buttonsLostTokensFire[r][c].setDisabledIcon((ImageIcon)iconsBuffer.get("Token.png"));
+			}		
+		}
+
+		ctr = 0;
+		lostTokensIce.clear();
+		for(int k=0;k<this.controller.getTurn().p2.tokens.size();k++){
+			int r = ctr / 3;
+	        int c = ctr % 3;
+			if( (this.controller.getTurn().p2.tokens.get(k).getRow() < 0) ){
+	        	lostTokensIce.add((MovablePlayerToken)this.controller.getTurn().p2.tokens.get(k));
+				buttonsLostTokensIce[r][c].setIcon(this.getTokenIcon(this.controller.getTurn().p2.tokens.get(k)));
+				buttonsLostTokensIce[r][c].setDisabledIcon(this.getTokenIcon(this.controller.getTurn().p2.tokens.get(k)));
+				ctr++;
+			}else{
+				buttonsLostTokensIce[r][c].setIcon((ImageIcon)iconsBuffer.get("Token.png"));
+				buttonsLostTokensIce[r][c].setDisabledIcon((ImageIcon)iconsBuffer.get("Token.png"));
+			}
+		}
+	
 		long endTime = System.currentTimeMillis();
 		System.out.println("updateGrid() " + (endTime - startTime) + " milliseconds");
     }
@@ -180,6 +444,32 @@ public class StrategoAppViewer {
 		}
 		if(tkn.getOwn() instanceof Ice){
 			filename = filename.concat("b");
+		}
+		filename = filename.concat(tkn.getName());
+		filename = filename.concat(".png");
+		return (ImageIcon)iconsBuffer.get(filename);		
+	}
+	
+	private ImageIcon getPlayerTokenHiddenIcon(PlayerToken tkn){
+		String filename = new String();
+		if(tkn.getOwn() instanceof Fire){
+			filename = filename.concat("r");
+		}
+		if(tkn.getOwn() instanceof Ice){
+			filename = filename.concat("b");
+		}
+		filename = filename.concat("Hidden");
+		filename = filename.concat(".png");
+		return (ImageIcon)iconsBuffer.get(filename);		
+	}
+	
+	private ImageIcon getPlayerTokenSpecialIcon(PlayerToken tkn){
+		String filename = new String();
+		if(tkn.getOwn() instanceof Fire){
+			filename = filename.concat("sr");
+		}
+		if(tkn.getOwn() instanceof Ice){
+			filename = filename.concat("sb");
 		}
 		filename = filename.concat(tkn.getName());
 		filename = filename.concat(".png");
@@ -204,58 +494,129 @@ public class StrategoAppViewer {
 	 * @param col THe clicked token column
 	 */
 	private void selectToken(int row, int col){
-		List<Vector2D> moveLocations = new ArrayList<Vector2D>();
+		//List<Vector2D> moveLocations = new ArrayList<Vector2D>();
 		//Check if clicked button is previously selected:
 		int i = row * this.N + col;
+		Token tkn = this.board.getToken(row,col);
+		boolean isSpecial = false;
+		//Check if token has special powers:
+		if(tkn instanceof Dragon || tkn instanceof Knight || tkn instanceof Elf || tkn instanceof Sorceress || tkn instanceof BeastRider){
+			isSpecial = true;
+		}
 		if(this.selectedToken == -1){
 			//highlight selected token:
-			this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
+			toggleSelectButton(this.buttons[row][col], true);
+			//this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
 			this.selectedToken = i;
-			Token tkn = this.StrategoBoard.getToken(row,col);
-			moveLocations = this.controller.tokenSelection(this.StrategoBoard, tkn);
-			//highlight selected token possible movement locations:
-			for(int ii=0;ii<moveLocations.size();ii++){
-				this.buttons[moveLocations.get(ii).y][moveLocations.get(ii).x].setBorder(BorderFactory.createLineBorder(Color.GREEN,3));				
+			
+			this.highlighter = this.controller.tokenSelection(this.board, tkn);
+			//highlight/enable selected token possible movement locations:
+			//toggleApplyHighlighter(true);
+			/*for(int ii=0;ii<highlighter.size();ii++){
+				//this.buttons[highlighter.get(ii).y][highlighter.get(ii).x].setBorder(BorderFactory.createLineBorder(Color.GREEN,3));
+				toggleHighlightButton(this.buttons[highlighter.get(ii).y][highlighter.get(ii).x], true);
+				toggleClickableButton(this.buttons[highlighter.get(ii).y][highlighter.get(ii).x], true);
+			}*/
+			
+		}else if((this.selectedToken == i) && (isSpecial) ){
+			//if special token cycle through: no selected, selected, special:
+			if(this.selectedSpecialPower){
+				toggleSelectButton(this.buttons[row][col], false);
+				this.selectedToken = -1;
+				this.selectedSpecialPower = false;
+			}else{
+				this.highlighter = this.controller.tokenSpecialSelection(this.board, tkn);
+				//this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.black,0));
+				toggleSelectButton(this.buttons[row][col], true);
+				//toggleApplyHighlighter(false);
+				this.selectedSpecialPower = true;
 			}
 			
-		}
-		else if(this.selectedToken == i){
-			this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.black,0));
+		}else if((this.selectedToken == i) && (!isSpecial) ){
+			//this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.black,0));
+			toggleSelectButton(this.buttons[row][col], false);
 			this.selectedToken = -1;
-		} else {
+			//toggleApplyHighlighter(false);
+		}else {
 			int r = this.selectedToken / this.N;
             int c = this.selectedToken % this.N;
 			//Check if the target is a token to interact with:
             long startTime = System.currentTimeMillis();
-			boolean rslt = this.controller.tokenAction(this.StrategoBoard, this.StrategoBoard.getToken(r,c), this.StrategoBoard.getToken(row,col),this);
+            boolean rslt = false;
+            if(this.selectedSpecialPower){
+            	rslt = this.controller.tokenAction(this.board, this.board.getToken(r,c), this.board.getToken(row,col), new Vector2D(row,col),this, true);
+            	this.selectedSpecialPower = false;
+            }else{
+            	rslt = this.controller.tokenAction(this.board, this.board.getToken(r,c), this.board.getToken(row,col), new Vector2D(row,col),this, false);
+            }
+			
 			long endTime = System.currentTimeMillis();
 			System.out.println("tokenAction() " + (endTime - startTime) + " milliseconds");
-			//Token tkn = this.StrategoBoard.getToken(row,col);
+			//Token tkn = this.board.getToken(row,col);
 			
 			if(rslt){
-				this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
+				//this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
+				//toggleSelectButton(this.buttons[r][c], false);
 				this.selectedToken = -1;
+				//toggleApplyHighlighter(false);
+				//Check if winning condition:
+				if(this.controller.getTurn().getWinner()!=null){
+					//Game ended, disable all tokens...
+					disableAllButtons();
+				}
 			}else{
-				this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
-				this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
+				//this.buttons[r][c].setBorder(BorderFactory.createLineBorder(Color.black,0));
+				//toggleSelectButton(this.buttons[r][c], true);
+				//this.buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW,3));
+				//toggleHighlightButton(this.buttons[row][col], true);
 				this.selectedToken = i;
+				System.out.println("FALSE tokenAction()");
 			}
 
-			this.updateGrid();
+			//this.updateGrid();
 		}
+		this.updateGrid();
 	}
 	
+	private static void resizePreview(JPanel innerPanel, JPanel container) {
+        int w = container.getWidth();
+        int h = container.getHeight();
+        int size =  Math.min(w, h);
+        innerPanel.setPreferredSize(new Dimension(920, 656));
+        container.revalidate();
+    }
 	
 	public void display() {
-        JFrame f = new JFrame("GridButton");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(createGridPanel());
-        this.updateGrid();
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
+        viewFrame = new JFrame("GridButton");
         
-        //StrategoAppController.tokenAction(this.StrategoBoard, this.StrategoBoard.getToken(0,0), this.StrategoBoard.getToken(0,1));
+        final JPanel containerPanel = new JPanel(new GridBagLayout());
+        final JPanel FirePanel = new JPanel(new GridBagLayout());
+        final JPanel IcePanel = new JPanel(new GridBagLayout());
+        final JPanel boardPanel = createGridPanel();
+        FirePanel.setBorder(BorderFactory.createLineBorder(Color.RED,0));
+        IcePanel.setBorder(BorderFactory.createLineBorder(Color.BLUE,0));
+        FirePanel.setVisible(true);
+        IcePanel.setVisible(true);
+        
+        containerPanel.add(FirePanel.add(createScoreGridPanel("Fire")));
+        containerPanel.add(boardPanel);
+        containerPanel.add(IcePanel.add(createScoreGridPanel("Ice")));
+        
+        /*containerPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizePreview(boardPanel, containerPanel);
+            }
+        });*/
+        viewFrame.getContentPane().add(containerPanel);
+        viewFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //viewFrame.setSize(920, 656);
+        this.updateGrid();
+        viewFrame.pack();
+        viewFrame.setLocationRelativeTo(null);
+        viewFrame.setVisible(true);
+        
+        //StrategoAppController.tokenAction(this.board, this.board.getToken(0,0), this.board.getToken(0,1));
         //this.updateGrid();
     }
 }

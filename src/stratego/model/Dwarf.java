@@ -10,4 +10,16 @@ public class Dwarf extends MovablePlayerToken implements Token {
 		super("Dwarf", own);
 		this.rank = 3;
 	}
+	
+	/**
+	 * Overrides Dwarf's special attack towards Trap. 
+	 */
+	public String attackTo(PlayerToken trg){
+		String outcome = super.attackTo(trg);
+		//if attack on Trap, lose:
+		if(trg instanceof Trap){
+			outcome = new String("won");
+		}
+		return outcome;
+	}
 }

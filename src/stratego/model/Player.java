@@ -10,7 +10,7 @@ public abstract class Player {
 	public String name;
 	public String pname;
 	//public String clan; 
-	public List<Token> tokens = new ArrayList<Token>(30);
+	public List<PlayerToken> tokens = new ArrayList<PlayerToken>(30);
 	
 	public Player(String pname, String name){
 		this.pname = pname;
@@ -51,4 +51,30 @@ public abstract class Player {
 		}
 		tokens.add( new Flag(this) );
 	}	
+	
+	/**
+	 * Returns player's Flag Token.
+	 * @return
+	 */
+	public PlayerToken getFlag(){
+		PlayerToken theFlag = null;
+		for(int i=0;i<this.tokens.size();i++){
+			if(this.tokens.get(i) instanceof Flag){
+				theFlag = this.tokens.get(i);
+				break;
+			}
+		}
+		return theFlag;
+	}
+	
+	public int getTotalSaves(){
+		int cumm = 0;
+		for(int i=0;i<this.tokens.size();i++){
+			if(this.tokens.get(i) instanceof MovablePlayerToken){
+				MovablePlayerToken mptk = (MovablePlayerToken)this.tokens.get(i);
+				cumm += mptk.getSavesPerformed();
+			}
+		}
+		return cumm;
+	}
 }

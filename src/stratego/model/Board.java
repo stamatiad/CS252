@@ -15,6 +15,7 @@ public class Board {
 	public final Token[] BoardTokens = new Token[80];
 	public Token grassToken;
 	public Token rockToken;
+	public List<PlayerToken> convertedTokens = new ArrayList<PlayerToken>();
 	
 	/**
 	 * Constracts and initializes an empty game Board.
@@ -63,5 +64,20 @@ public class Board {
 		return this.N;
 	}
 	
-
+	/**
+	 * Check if PlayerToken is converted once during the game.
+	 * @param tkn
+	 */
+	public boolean isConverted(PlayerToken tkn){
+		boolean output = false;
+		for(int k=0 ; k<this.convertedTokens.size() ; k++){
+			//Check by reference:
+			if(tkn == this.convertedTokens.get(k)){
+				output = true;
+			}else{
+				output = false;
+			}
+		}
+		return output;
+	}
 }

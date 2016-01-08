@@ -1,5 +1,8 @@
 package stratego.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Scout extends MovablePlayerToken implements Token {
 
 	/**
@@ -10,4 +13,6 @@ public class Scout extends MovablePlayerToken implements Token {
 		super("Scout", own);
 		this.rank = 2;
 	}
+	
+
 }

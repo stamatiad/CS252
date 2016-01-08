@@ -5,7 +5,7 @@ package stratego.model;
  * @author steve
  *
  */
-public class Dragon extends MovablePlayerToken implements Token{
+public class Dragon extends SpecialMovablePlayerToken implements Token{
 	
 	/**
 	 * <b>postcondition</b>: Constructs Dragon Player Token
