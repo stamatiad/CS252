@@ -81,11 +81,11 @@ public class StrategoAppController {
 	}
 	
 	/**
-	 * 
-	 * @param b
-	 * @param t
-	 * @param row
-	 * @param col
+	 * Insert Token reference to Board.
+	 * @param b Board Object.
+	 * @param t Input Token reference.
+	 * @param row Insert position in Board.
+	 * @param col Insert position in Board.
 	 */
 	public void insertToken2Board(Board b, Token t, int row, int col){
 		if(t instanceof PlayerToken){
@@ -97,12 +97,25 @@ public class StrategoAppController {
 		b.BoardTokens[index] = t;
 	}
 	
-	
+	/**
+	 * <b>pre-condition</b>: The board to be initialized and players to be existent. 
+	 * Get the reference for Board Token in input position.
+	 * @param b
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public Token getReference2Token(Board b, int row, int col){
 		int index = row * this.N + col;
 		return b.BoardTokens[index];
 	}
 	
+	/**
+	 * Implements Scout moving model.
+	 * @param board
+	 * @param sct
+	 * @return
+	 */
 	public List<Vector2D> movementSystemScout(Board board, Scout sct){
 		List<Vector2D> sctMovements = new ArrayList<Vector2D>();
 		//move in each direction until hitting something:
@@ -201,6 +214,12 @@ public class StrategoAppController {
 		return sctMovements;
 	}
 	
+	/**
+	 * Implements Dragon moving/attack model.
+	 * @param board
+	 * @param drg
+	 * @return
+	 */
 	public List<Vector2D> powerMovementSystemFlight(Board board, Dragon drg){
 		List<Vector2D> drgMovements = new ArrayList<Vector2D>();
 		//move in each direction skipping first obstacle:
@@ -336,7 +355,12 @@ public class StrategoAppController {
 		return drgMovements;
 	}
 	
-	
+	/**
+	 * Implements Speed special movement/attack model.
+	 * @param board
+	 * @param mtkn
+	 * @return
+	 */
 	public List<Vector2D> powerMovementSystemSpeed(Board board, MovablePlayerToken mtkn){
 		List<Vector2D> movements = new ArrayList<Vector2D>();
 		List<Vector2D> extraMovements = new ArrayList<Vector2D>();
@@ -369,6 +393,12 @@ public class StrategoAppController {
 		return movements;		
 	}
 	
+	/**
+	 * Implements Range special attack model. 
+	 * @param board
+	 * @param mtkn
+	 * @return
+	 */
 	public List<Vector2D> powerMovementSystemRange(Board board, MovablePlayerToken mtkn){
 		List<Vector2D> movements = new ArrayList<Vector2D>();
 
@@ -391,6 +421,13 @@ public class StrategoAppController {
 		return movements;	
 	}
 	
+	/**
+	 * <b>pre-condition</b>: The Token to exist in Board.  
+	 * Computes valid movement locations for the token in board.
+	 * @param board
+	 * @param tkn
+	 * @return
+	 */
 	public List<Vector2D> tokenSelection(Board board, Token tkn){
 		//List<Vector2D> moveLocations = new ArrayList<Vector2D>();
 		this.moveLocations = new ArrayList<Vector2D>();
@@ -417,6 +454,13 @@ public class StrategoAppController {
 		return this.moveLocations;
 	}
 	
+	/**
+	 * <b>pre-condition</b>: Token to be on board and belong to special Tokens.
+	 * Computes valid movement/attack locations for the token in board.
+	 * @param board
+	 * @param tkn
+	 * @return
+	 */
 	public List<Vector2D> tokenSpecialSelection(Board board, Token tkn){
 		this.moveLocations = new ArrayList<Vector2D>();
 		//Check if token has special powers:
@@ -467,6 +511,7 @@ public class StrategoAppController {
 	/**
 	 * Return true if position falls on top of rocks, on board. Else returns false. Does not
 	 * check if position is inside board bounds!
+	 * <b>pre-condition</b>: The position must be inside board bounds.
 	 * @param pos The Vector2D of the queried position on board.
 	 * @return true if position falls on top of rocks. Else returns false.
 	 */
@@ -495,6 +540,12 @@ public class StrategoAppController {
 		return loc;
 	}
 	
+	/**
+	 * Filter valid movements in order to not conflict with same player Tokens.
+	 * @param board
+	 * @param loc
+	 * @return
+	 */
 	public List<Vector2D> validInPlayer(Board board, List<Vector2D> loc){
 		//remove locations if they fall on same player tokens:
 		for (int i=loc.size()-1 ; i>=0 ; i--){
@@ -507,11 +558,15 @@ public class StrategoAppController {
 		return loc;
 	}
 	
+	/**
+	 * Valid classic (cross-like) attack positions for each position in input list,
+	 * that enemy Token exists.
+	 * @param board
+	 * @param loc
+	 * @return
+	 */
 	public List<Vector2D> validForAttack(Board board, List<Vector2D> loc){
-		//
 		for (int i=loc.size()-1 ; i>=0 ; i--){
-			//Smarter way to check:
-			//
 			if(!(board.getToken(loc.get(i).y,loc.get(i).x).getOwn() == this.getTurn().otherSide())){
 				loc.remove(i);
 			}
@@ -638,6 +693,14 @@ public class StrategoAppController {
 
 	}
 	
+	/**
+	 * Saves the lost (input) Token and places it back to the
+	 * board in the first empty position. If no empty position
+	 * Token is not saved.
+	 * @param board
+	 * @param tkn
+	 * @return
+	 */
 	public boolean saveToken(Board board, MovablePlayerToken tkn){
 		//Check if input Token is indeed killed;
 		if(tkn.getCol()>=0){
@@ -737,8 +800,9 @@ public class StrategoAppController {
 	}
 	
 	/**
-	 * Check if next move is impossible. Must be called after a tokenAction
-	 * have been made. Consequently check if nonactive player has available moves
+	 * Check if next move is impossible. 
+	 * <b>pre-condition</b>: Must be called after a tokenAction have been made. 
+	 * Consequently check if nonactive player has available moves
 	 * @return boolean if true.
 	 */
 	public boolean isThereNextMovePossible(Board board, Turn turn){
@@ -762,8 +826,10 @@ public class StrategoAppController {
 	}
 	
 	/**
-	 * Check if dropped flag. Must be called after a tokenAction
-	 * have been made. Consequently check if nonactive player lost its Flag.
+	 * Check if dropped flag. 
+	 * <b>pre-condition</b>: Must be called after a tokenAction
+	 * have been made. 
+	 * Consequently check if non-active player lost its Flag.
 	 * @return boolean if true.
 	 */
 	public boolean isThereDropedFlag(Turn turn){
