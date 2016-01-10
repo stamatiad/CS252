@@ -108,7 +108,6 @@ public class StrategoAppViewer {
 		//Empty background Token:
 		iconsBuffer.put("Token.png", getIconImage("Token.png"));
 
-
 	}
 
 	/**
@@ -509,7 +508,6 @@ public class StrategoAppViewer {
 				toggleHighlightButton(this.buttons[highlighter.get(ii).y][highlighter.get(ii).x], true);
 				toggleClickableButton(this.buttons[highlighter.get(ii).y][highlighter.get(ii).x], true);
 			}*/
-			
 		}else if((this.selectedToken == i) && (isSpecial) ){
 			//if special token cycle through: no selected, selected, special:
 			if(this.selectedSpecialPower){
